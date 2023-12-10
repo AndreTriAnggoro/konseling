@@ -6,6 +6,8 @@ use App\Models\DosenWali;
 use App\Models\Jadwal;
 use App\Models\Pembayaran;
 use App\Models\Konseling;
+use App\Models\Mahasiswa;
+use App\Models\Nilai;
 use App\Models\TopikKonseling;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -275,12 +277,7 @@ class JadwalController extends Controller
 
             return view('dashboard_dosen', compact('permintaanKonseling', 'AccKonseling', 'selesai', 'tolak', 'sedangBerlangsung', 'comingSoonJadwals', 'expired'));
         } elseif ($user->hasRole('kaprodi')) {
-            $statusDitampilkan = ['dikirim', 'Acc', 'Tolak', 'Selesai', 'Dibatalkan', 'Expired'];
-            $jadwalKonseling = Jadwal::with(['mahasiswa', 'topikkonseling'])
-                ->whereIn('status_verifikasi', $statusDitampilkan)
-                ->get();
-
-            return view('dashboard_dosen', ['jadwalKonseling' => $jadwalKonseling]);
+            return view('dashboard_kaprodi');
         } elseif ($user->hasRole('superadmin')) {
 
 
@@ -290,9 +287,67 @@ class JadwalController extends Controller
             return view('dashboard_admin', ['pembayaranBelumDiverifikasi' => $pembayaranBelumDiverifikasi]);
         } elseif ($user->hasRole('keuangan')) {
 
+            $belumBayar = Pembayaran::where('status_pembayaran', 'Belum Bayar')->get();
+            $dalamProses = Pembayaran::where('status_pembayaran', 'Dalam Proses')->get();
+            $Lunas = Pembayaran::where('status_pembayaran', 'Lunas')->get();
+
+            $jumlahBelumBayar = $belumBayar->count();
+            $jumlahDalamProses = $dalamProses->count();
+            $jumlahLunas = $Lunas->count();
+
             $pembayaranBelumDiverifikasi = Pembayaran::where('status_pembayaran', 'Dalam Proses')->get();
 
-            return view('dashboard_admin', ['pembayaranBelumDiverifikasi' => $pembayaranBelumDiverifikasi]);
+            return view('dashboard_keuangan', compact('belumBayar', 'dalamProses', 'Lunas', 'jumlahBelumBayar', 'jumlahDalamProses', 'jumlahLunas', 'pembayaranBelumDiverifikasi'));
+        } elseif ($user->hasRole('BAAK')) {
+
+            $now = now();
+            $jadwalKonseling = Jadwal::with(['mahasiswa', 'topikkonseling'])
+                ->where('status_verifikasi', 'Acc')
+                ->get();
+
+            $sedangBerlangsung = $jadwalKonseling->filter(function ($jadwal) use ($now) {
+                $tanggalJadwal = Carbon::parse($jadwal->tanggal);
+
+                return $tanggalJadwal->year === $now->year &&
+                    $tanggalJadwal->month === $now->month &&
+                    $tanggalJadwal->day === $now->day &&
+                    ($tanggalJadwal->hour === $now->hour && $tanggalJadwal->minute < $now->minute || $tanggalJadwal->hour < $now->hour);
+            });
+
+            $jumlahMahasiswa = Mahasiswa::count();
+            $jumlahDosen = DosenWali::count();
+            $jumlahSelesaiKonseling = Konseling::count();
+
+            $Konseling = Konseling::all(); // Gantilah dengan model dan metode sesuai dengan aplikasi Anda
+
+            // Inisialisasi total waktu dan jumlah sesi konseling
+            $totalDurasi = 0;
+            $jumlahSesiKonseling = 0;
+
+            foreach ($Konseling as $jadwal) {
+                // Hitung durasi sesi konseling menggunakan Carbon
+                $durasiSesi = Carbon::parse($jadwal->updated_at)->diffInSeconds($jadwal->tanggal);
+
+                // Tambahkan ke total durasi
+                $totalDurasi += $durasiSesi;
+
+                // Tingkatkan jumlah sesi konseling
+                $jumlahSesiKonseling++;
+            }
+
+            // Hitung rata-rata durasi konseling dalam detik
+            $rataRataDurasi = $jumlahSesiKonseling > 0 ? ($totalDurasi / $jumlahSesiKonseling) : 0;
+
+            // Konversi rata-rata waktu ke format yang sesuai (misalnya, jam:menit:detik)
+            $rataRataDurasiFormat = sprintf(
+                '%s%s',
+                $rataRataDurasi >= 3600 ? sprintf('%02d jam ', ($rataRataDurasi / 3600)) : '',
+                $rataRataDurasi >= 60 ? sprintf('%02d menit ', ($rataRataDurasi % 3600 / 60)) : '',
+            );
+
+            return view('dashboard_baak', compact('jumlahMahasiswa', 'jumlahDosen', 'jumlahSelesaiKonseling', 'sedangBerlangsung', 'rataRataDurasiFormat'));
+        } elseif ($user->hasRole('kajur')) {
+            return view('dashboard_kajur');
         }
     }
 }

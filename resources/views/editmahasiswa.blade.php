@@ -56,14 +56,6 @@
                 </div>
 
                 <div class="form-group col-md-6">
-                    <label for="tanggal_lahir">Tanggal Lahir:</label>
-                    <input type="date" name="tanggal_lahir" id="tanggal_lahir" class="form-control" value="{{ $mahasiswa->tanggal_lahir }}" required>
-                    @if ($errors->has('tanggal_lahir'))
-                    <div class="alert alert-danger">{{ $errors->first('tanggal_lahir') }}</div>
-                    @endif
-                </div>
-
-                <div class="form-group col-md-6">
                     <label for="email">Email:</label>
                     <input type="email" name="email" id="email" class="form-control" value="{{ $mahasiswa->email }}" required>
                     @if ($errors->has('email'))

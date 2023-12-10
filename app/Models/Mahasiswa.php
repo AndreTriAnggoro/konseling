@@ -4,16 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Mahasiswa extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $table = "mahasiswa";
     protected $primaryKey = "nim";
     protected $fillable = [
         'nim', 'id_programstudi', 'nama', 'alamat', 'jenis_kelamin', 'email', 'no_hp', 'created_at', 'updated_at',
     ];
+
+    public function getStatus()
+    {
+        if ($this->trashed()) {
+            return 'Mahasiswa sudah dihapus (soft delete)';
+        } else {
+            return 'Mahasiswa masih aktif';
+        }
+    }
 
     public function getTanggalLahirAttribute($value)
     {
@@ -32,5 +43,9 @@ class Mahasiswa extends Model
     public function pembayaran()
     {
         return $this->hasMany(Pembayaran::class, 'nim', 'nim');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'nim', 'username');
     }
 }

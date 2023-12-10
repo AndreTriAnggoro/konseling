@@ -2,7 +2,7 @@
 @section('content')
 
 <div class="content">
-    <div class="card card-info card-outline">
+    
         <div class="card-body">
             @can('tambah-dosen')
             <a href="{{ route('dosen.create') }}" class="btn btn-primary mb-3">Tambah Mahasiswa</a>
@@ -82,7 +82,6 @@
                 @endforeach
             </table>
         </div>
-    </div>
 </div>
 @endsection
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

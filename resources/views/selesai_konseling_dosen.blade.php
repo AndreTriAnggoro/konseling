@@ -30,6 +30,16 @@ use App\Helpers\CarbonHelper;
                         <td>
                             {{ CarbonHelper::customDiffForHumans($jadwal->updated_at, $jadwal->tanggal) }}
                         </td>
+                            <?php
+                            // Hitung waktu dalam detik menggunakan Carbon
+                            $waktuDetik = \Carbon\Carbon::parse($jadwal->updated_at)->diffInSeconds($jadwal->tanggal);
+
+                            // Tambahkan ke total waktu
+                            $totalWaktu += $waktuDetik;
+
+                            // Tingkatkan jumlah sesi konseling
+                            $jumlahSesiKonseling++;
+                            ?>
                         <td>{{ $jadwal->konseling->permasalahan }}</td>
                         <td>{{ $jadwal->konseling->solusi }}</td>
                         <!-- <td class="text-danger font-weight-medium">

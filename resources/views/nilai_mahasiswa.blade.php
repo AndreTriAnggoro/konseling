@@ -17,7 +17,7 @@
                             <h5 class="modal-title" id="importModalLabel">Import Excel</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
-                            </button>   
+                            </button>
                         </div>
                         <div class="modal-body">
                             <form action="{{ route('importNilai') }}" method="post" enctype="multipart/form-data">
@@ -52,35 +52,41 @@
             </div>
             @endif
 
-            <table class="table table-bordered">
-                <tr>
-                    <th>nim</th>
-                    <th>semester 1</th>
-                    <th>semester 2</th>
-                    <th>semester 3</th>
-                    <th>semester 4</th>
-                    <th>semester 5</th>
-                    <th>semester 6</th>
-                    <th>semester 7</th>
-                    <th>semester 8</th>
-                    <th>ipk</th>
-                </tr>
-                @foreach ($nilai as $item)
-                <tr>
-                    <td>{{ $item->nim }}</td>
-                    <td>{{ $item->semester1 }}</td>
-                    <td>{{ $item->semester2 }}</td>
-                    <td>{{ $item->semester3 }}</td>
-                    <td>{{ $item->semester4 }}</td>
-                    <td>{{ $item->semester5 }}</td>
-                    <td>{{ $item->semester6 }}</td>
-                    <td>{{ $item->semester7 }}</td>
-                    <td>{{ $item->semester8 }}</td>
-                    <td>{{ $item->ipk }}</td>
-                </tr>
-                @endforeach
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">NIM</th>
+                        <th scope="col">Semester 1</th>
+                        <th scope="col">Semester 2</th>
+                        <th scope="col">Semester 3</th>
+                        <th scope="col">Semester 4</th>
+                        <th scope="col">Semester 5</th>
+                        <th scope="col">Semester 6</th>
+                        <th scope="col">Semester 7</th>
+                        <th scope="col">Semester 8</th>
+                        <th scope="col">IPK</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($nilai as $item)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $item->nim }}</td>
+                        <td>{{ $item->semester1 }}</td>
+                        <td>{{ $item->semester2 }}</td>
+                        <td>{{ $item->semester3 }}</td>
+                        <td>{{ $item->semester4 }}</td>
+                        <td>{{ $item->semester5 }}</td>
+                        <td>{{ $item->semester6 }}</td>
+                        <td>{{ $item->semester7 }}</td>
+                        <td>{{ $item->semester8 }}</td>
+                        <td>{{ $item->ipk }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
             </table>
-            
         </div>
     </div>
 </div>

@@ -12,35 +12,47 @@
 </head>
 
 <body>
-    <h2>Pembayaran UKT</h2>
-    <form action="{{ route('mahasiswa.ukt') }}" method="GET">
-        <label for="search">Cari aja :</label>
-        <input type="text" name="search" id="search" value="{{ request('search') }}">
-        <button type="submit">Cari</button>
+    <h2 class="mt-3 mb-4">Daftar Pembayaran UKT</h2>
+    <form action="{{ route('ukt.mahasiswa') }}" method="GET" class="mb-4">
+        <div class="form-group">
+            <label for="search">Cari NIM:</label>
+            <div class="input-group">
+                <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Cari</button>
+                </div>
+            </div>
+        </div>
     </form>
 
-    <table>
+    <table class="table">
         <thead>
             <tr>
-                <!-- <th>ID Pembayaran</th> -->
-                <th>NIM</th>
-                <th>Jumlah Pembayaran</th>
-                <th>Status Pembayaran</th>
-                <th>Tanggal Pembayaran</th>
-                <th>Bukti Pembayaran</th>
-                <!-- <th>Aksi</th> -->
+                <th scope="col">#</th>
+                <th scope="col">NIM</th>
+                <th scope="col">Jumlah Pembayaran</th>
+                <th scope="col">Status Pembayaran</th>
+                <th scope="col">Tanggal Pembayaran</th>
+                <th scope="col">Bukti Pembayaran</th>
             </tr>
         </thead>
         <tbody>
             @foreach($pembayaranUktMahasiswa as $pembayaran)
             <tr>
+                <td>{{ $loop->iteration }}</td>
                 <td>{{ $pembayaran->nim }}</td>
                 <td>{{ $pembayaran->jumlah_pembayaran }}</td>
                 <td>{{ $pembayaran->status_pembayaran }}</td>
                 <td>{{ $pembayaran->tanggal_pembayaran }}</td>
-                <td><a href="#" data-toggle="modal" data-target="#buktiPembayaranModal{{ $pembayaran->id_pembayaran }}">
+                <td>
+                    @if($pembayaran->status_pembayaran === 'Lunas')
+                    <a href="#" data-toggle="modal" data-target="#buktiPembayaranModal{{ $pembayaran->id_pembayaran }}">
                         Lihat Bukti
-                    </a></td>
+                    </a>
+                    @else
+                    Belum Lunas
+                    @endif
+                </td>
             </tr>
 
             <div class="modal fade" id="buktiPembayaranModal{{ $pembayaran->id_pembayaran }}" tabindex="-1" role="dialog" aria-labelledby="buktiPembayaranModalLabel{{ $pembayaran->id_pembayaran }}" aria-hidden="true">

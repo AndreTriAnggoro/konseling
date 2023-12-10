@@ -25,6 +25,33 @@
           </li>
           @endcan
 
+          @can('kelola-ukt')
+          <li>
+            <a href="{{ route('ukt.belum.bayar') }}">
+              <span class="link-title">Belum Bayar</span>
+              <i class="mdi mdi-gauge link-icon"></i>
+            </a>
+          </li>
+          @endcan
+
+          @can('kelola-ukt')
+          <li>
+            <a href="{{ route('ukt.diproses') }}">
+              <span class="link-title">Belum Diproses</span>
+              <i class="mdi mdi-gauge link-icon"></i>
+            </a>
+          </li>
+          @endcan
+
+          @can('kelola-ukt')
+          <li>
+            <a href="{{ route('ukt.lunas') }}">
+              <span class="link-title">Lunas</span>
+              <i class="mdi mdi-gauge link-icon"></i>
+            </a>
+          </li>
+          @endcan
+
           @can('manage-dosen')
           <li>
             <a href="{{ route('dosen') }}">
@@ -34,23 +61,23 @@
           </li>
           @endcan
           
-          @role('mahasiswa')
+          @can('bikin-jadwal')
           <li>
             <a href="{{ route('buat.jadwal') }}">
               <span class="link-title">Yuk Jadwalkan</span>
               <i class="mdi mdi-gauge link-icon"></i>
             </a>
           </li>
-          @endrole
+          @endcan
 
-          @role('dosenwali')
+          @can('informasi-ukt')
           <li>
-            <a href="{{ route('mahasiswa.ukt') }}">
-              <span class="link-title">Pembayaran UKT dosen</span>
+            <a href="{{ route('ukt.mahasiswa') }}">
+              <span class="link-title">Pembayaran UKT</span>
               <i class="mdi mdi-gauge link-icon"></i>
             </a>
           </li>
-          @endrole
+          @endcan
 
           @role('mahasiswa')
           <li>
@@ -61,7 +88,7 @@
           </li>
           @endrole
           
-          @can('manage-nilai')
+          @can('kelola-nilai')
           <li>
             <a href="{{ route('nilai.mahasiswa') }}">
               <span class="link-title">Nilai Mahasiswa</span>

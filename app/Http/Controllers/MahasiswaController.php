@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\MahasiswaImport;
 use App\Models\Mahasiswa;
 use App\Models\User;
 use App\Models\Pembayaran;
@@ -20,14 +18,35 @@ class MahasiswaController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function uktlunas()
+    {
+        $pembayaranLunas = Pembayaran::where('status_pembayaran', 'Lunas')->get();
+        return view('uktLunas', compact('pembayaranLunas'));
+    }
+    public function tes()
+    {
+        return view('app/tes');
+    }
+    public function uktdiproses()
+    {
+        $pembayaranDiproses = Pembayaran::where('status_pembayaran', 'Dalam Proses')->get();
+        return view('uktDiproses', compact('pembayaranDiproses'));
+    }
+    public function uktbelumbayar()
+    {
+        $pembayaranBelumDiverifikasi = Pembayaran::where('status_pembayaran', 'Belum Bayar')->get();
+        return view('uktBelumVerif', compact('pembayaranBelumDiverifikasi'));
+    }
     public function index()
     {
-        // $mahasiswa = Mahasiswa::with('programstudi')->get();
-        // $mahasiswa = Mahasiswa::paginate(15);
-        // return view('mahasiswa', compact('mahasiswa'));
-
         $mahasiswa = Mahasiswa::with('programstudi')->paginate(15);
         return view('mahasiswa', compact('mahasiswa'));
+    }
+
+    public function inactive()
+    {
+        $mahasiswaInactive = Mahasiswa::onlyTrashed()->with('programstudi')->get();
+        return view('mahasiswa_tidak_aktif', compact('mahasiswaInactive'));
     }
 
     public function verifikasi($id_pembayaran)
@@ -107,7 +126,7 @@ class MahasiswaController extends Controller
 
     public function nilai()
     {
-        $nilai = Nilai::with('mahasiswa')->paginate(15);
+        $nilai = Nilai::paginate(15);
         return view('nilai_mahasiswa', compact('nilai'));
     }
 
@@ -147,6 +166,10 @@ class MahasiswaController extends Controller
         $user->save();
 
         $user->assignRole('mahasiswa');
+
+        $pembayaran = new Pembayaran();
+        $pembayaran->nim = $request->input('nim');
+        $pembayaran->save();
 
         // event(new CreateMahasiswaUser($mahasiswa));
 
@@ -212,18 +235,55 @@ class MahasiswaController extends Controller
      */
     public function destroy($nim)
     {
-        // Cari mahasiswa berdasarkan ID
-        $mahasiswa = Mahasiswa::find($nim);
+        // Cari mahasiswa berdasarkan nim
+        $mahasiswa = Mahasiswa::with('user')->find($nim);
 
-        // Hapus mahasiswa jika ditemukan
+        // Hapus mahasiswa dan pengguna jika ditemukan
         if ($mahasiswa) {
+            // Hapus pengguna terkait
+            if ($mahasiswa->user) {
+                User::where('username', $mahasiswa->user->username)->delete();
+            }
+
+            // Hapus mahasiswa
             $mahasiswa->delete();
+
             // Redirect ke halaman daftar mahasiswa atau halaman lain yang sesuai
             return redirect()->route('mahasiswa');
         } else {
             // Tampilkan pesan error jika mahasiswa tidak ditemukan
             abort(404, 'Mahasiswa not found.');
         }
+    }
+    public function restore($nim)
+    {
+        // Lakukan proses restore mahasiswa berdasarkan nim
+        Mahasiswa::withTrashed()->where('nim', $nim)->restore();
+
+        // Dapatkan data mahasiswa yang sudah di-restore
+        $mahasiswaRestored = Mahasiswa::find($nim);
+
+        // Jika mahasiswa ditemukan, lakukan proses pengembalian data user
+        if ($mahasiswaRestored) {
+            // Dapatkan atau buat user baru berdasarkan username (nim)
+            $user = User::firstOrNew(['username' => $mahasiswaRestored->nim]);
+
+            // Isi kolom name dengan data nama dari tabel mahasiswa
+            $user->name = $mahasiswaRestored->nama;
+
+            // Isi kolom password dengan password default (Anda bisa menggunakan Hash::make('12345678') jika menggunakan Laravel Hashing)
+            $user->password = bcrypt('12345678');
+            // Tambahkan proses pengembalian data user sesuai kebutuhan
+            // ...
+
+            // Simpan perubahan pada data user
+            $user->save();
+            $user->assignRole('mahasiswa');
+        }
+
+        // Redirect kembali ke halaman mahasiswa tidak aktif
+        $mahasiswaInactive = Mahasiswa::onlyTrashed()->with('programstudi')->get();
+        return view('mahasiswa_tidak_aktif', compact('mahasiswaInactive'));
     }
 
     public function __construct()
@@ -238,6 +298,7 @@ class MahasiswaController extends Controller
     {
         return view('upload');
     }
+
     public function mahasiswaUkt(Request $request)
     {
         $query = Pembayaran::query();
@@ -254,9 +315,6 @@ class MahasiswaController extends Controller
         $pembayaranUktMahasiswa = $query->get();
 
         return view('mahasiswa_ukt', compact('pembayaranUktMahasiswa'));
-
-        // $pembayaranUktMahasiswa = Pembayaran::get();
-        // return view('mahasiswa_ukt', compact('pembayaranUktMahasiswa'));
     }
 
     public function upload(Request $request)

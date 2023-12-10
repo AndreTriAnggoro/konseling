@@ -2,12 +2,13 @@
 @section('content')
 
 <div class="content">
-    <div class="card card-info card-outline">
+    
         <div class="card-body">
             @can('tambah-mahasiswa')
             <a href="{{ route('mahasiswa.create') }}" class="btn btn-primary mb-3">Tambah Mahasiswa</a>
             @endcan
             <a href="#" class="btn btn-success mb-3" id="importButton">Import Excel</a>
+            <a href="{{ route('mahasiswa.inactive') }}" class="btn btn-primary mb-3" id="buttonMahasiswa">Mahasiswa Tidak Aktif</a>
 
             <!-- Modal Import Excel -->
             <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
@@ -37,36 +38,29 @@
                 </div>
             </div>
 
-            <div class="row mb-3">
-                <div class="col-md-8">
-                    <input type="text" name="search_query" class="form-control" id="search_query" placeholder="Cari data" aria-label="Cari data">
-                </div>
-                <div class="col-md-4">
-                    <button class="btn btn-primary" id="searchButton">Cari</button>
-                </div>
-            </div>
-
             @if (session('importError'))
             <div class="alert alert-danger mb-3">
                 {{ session('importError') }}
             </div>
             @endif
 
-            <table class="table table-bordered">
-                <tr>
-                    <th>nim</th>
-                    <th>nama</th>
-                    <th>programstudi</th>
-                    <th>jenis kelamin</th>
-                    <th>alamat</th>
-                    <th>email</th>
-                    <th>no hp</th>
-                    @if (auth()->user()->can('edit-mahasiswa') || auth()->user()->can('hapus-mahasiswa'))
-                    <th>Aksi</th>
-                    @endif
-                </tr>
+            <table class="table" id="example">
+                <thead>
+                    <tr>
+                        <th>nim</th>
+                        <th>nama</th>
+                        <th>programstudi</th>
+                        <th>jenis kelamin</th>
+                        <th>alamat</th>
+                        <th>email</th>
+                        <th>no hp</th>
+                        @if (auth()->user()->can('edit-mahasiswa') || auth()->user()->can('hapus-mahasiswa'))
+                        <th>Aksi</th>
+                        @endif
+                    </tr>
+                </thead>
                 @foreach ($mahasiswa as $item)
-                <tr>
+                <tr @if ($item->trashed()) style="background-color: #ffcccc;" @endif>
                     <td>{{ $item->nim }}</td>
                     <td>{{ $item->nama }}</td>
                     <td>{{ $item->programstudi ? $item->programstudi->nama_prodi : 'Tidak ada prodi' }}</td>
@@ -84,7 +78,7 @@
                         <form action="{{ route('mahasiswa.destroy', $item->nim) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus mahasiswa ini?')">Delete</button>
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus mahasiswa ini?')">Non Aktif</button>
                         </form>
                         @endcan
                     </td>
@@ -93,40 +87,8 @@
                 </tr>
                 @endforeach
             </table>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-end">
-                    <!-- Previous Page Link -->
-                    @if ($mahasiswa->onFirstPage())
-                    <li class="page-item disabled">
-                        <span class="page-link">Previous</span>
-                    </li>
-                    @else
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $mahasiswa->previousPageUrl() }}" rel="prev">Previous</a>
-                    </li>
-                    @endif
-
-                    <!-- Page Links -->
-                    @foreach ($mahasiswa->getUrlRange(1, $mahasiswa->lastPage()) as $page => $url)
-                    <li class="page-item {{ $page == $mahasiswa->currentPage() ? 'active' : '' }}">
-                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                    </li>
-                    @endforeach
-
-                    <!-- Next Page Link -->
-                    @if ($mahasiswa->hasMorePages())
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $mahasiswa->nextPageUrl() }}" rel="next">Next</a>
-                    </li>
-                    @else
-                    <li class="page-item disabled">
-                        <span class="page-link">Next</span>
-                    </li>
-                    @endif
-                </ul>
-            </nav>
         </div>
-    </div>
+    
 </div>
 
 @endsection
@@ -149,26 +111,49 @@
             $('#selectedFileName').text('File yang dipilih: ' + fileName);
         });
 
-        $('#searchButton').click(function() {
-            var searchQuery = $('#search_query').val().toLowerCase();
+        // $('#searchButton').click(function() {
+        //     var searchQuery = $('#search_query').val().toLowerCase();
 
-            // Hapus pewarnaan sebelumnya
-            $('table tbody tr').find('td').each(function() {
-                var cellText = $(this).text().toLowerCase();
-                if (cellText.includes(searchQuery)) {
-                    $(this).css('background-color', '#ffff99'); // Ganti dengan warna yang diinginkan
-                } else {
-                    $(this).css('background-color', '');
-                }
-            });
+        //     // Hapus pewarnaan sebelumnya
+        //     $('table tbody tr').find('td').each(function() {
+        //         var cellText = $(this).text().toLowerCase();
+        //         if (cellText.includes(searchQuery)) {
+        //             $(this).css('background-color', '#ffff99'); // Ganti dengan warna yang diinginkan
+        //         } else {
+        //             $(this).css('background-color', '');
+        //         }
+        //     });
 
-            // Filter baris berdasarkan kata kunci
-            $('table tbody tr').filter(function() {
-                var rowText = $(this).text().toLowerCase();
-                $(this).toggle(rowText.includes(searchQuery));
+        //     // Filter baris berdasarkan kata kunci
+        //     $('table tbody tr').filter(function() {
+        //         var rowText = $(this).text().toLowerCase();
+        //         $(this).toggle(rowText.includes(searchQuery));
+        //     });
+        // });
+
+
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        // Menangani klik pada tautan Mahasiswa Tidak Aktif
+        $('#buttonMahasiswa').click(function() {
+            // Memuat data mahasiswa tidak aktif menggunakan AJAX
+            $.get("{{ route('mahasiswa.inactive') }}", function(data) {
+                // Mengganti data tabel dengan data yang dimuat
+                updateTable(data);
             });
         });
-
-        
     });
+
+    function updateTable(data) {
+        // Menghapus data tabel yang ada sebelumnya
+        $('#mahasiswaTable tbody').empty();
+
+        // Memasukkan data baru ke dalam tabel
+        data.forEach(function(item) {
+            $('#mahasiswaTable tbody').append('<tr><td>' + item.nim + '</td><td>' + item.nama + '</td></tr>');
+            // Tambahkan kolom lain sesuai kebutuhan
+        });
+    }
 </script>

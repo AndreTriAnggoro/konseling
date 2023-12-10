@@ -10,6 +10,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 // use Illuminate\Validation\ValidationException;
 // use Illuminate\Support\Facades\Validator;
 use App\Models\Mahasiswa;
+use App\Models\Pembayaran;
 use App\Models\Nilai;
 use App\Models\User;
 
@@ -97,12 +98,13 @@ class ImportController extends Controller
                     'semester6' => $data[$i][7],
                     'semester7' => $data[$i][8],
                     'semester8' => $data[$i][9],
-                    'ukt' => $data[$i][10],
+                    'ipk' => $data[$i][10],
                 ]);
             }
 
             return redirect()->back()->with('success', 'Data berhasil diimpor');
         } catch (\Exception $e) {
+            dd($e->getMessage());
             return redirect()->back()->with('importError', 'Data gagal diimpor');
         }
     }
@@ -145,6 +147,10 @@ class ImportController extends Controller
                 $user->username = $data[$i][1]; // Gunakan nim sebagai nama pengguna
                 $user->password = bcrypt('12345678'); // Tentukan kata sandi default atau sesuaikan sesuai kebutuhan
                 $user->save();
+
+                $pembayaran = new Pembayaran();
+                $pembayaran->nim = $data[$i][1];
+                $pembayaran->save();
 
                 // Atur peran pengguna
                 $user->assignRole('mahasiswa');

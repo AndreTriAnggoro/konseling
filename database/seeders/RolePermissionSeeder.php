@@ -21,7 +21,7 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name'=>'hapus-mahasiswa']);
 
         Permission::create(['name'=>'tambah-jadwal']);
-        Permission::create(['name'=>'buat-jadwal']);
+        Permission::create(['name'=>'bikin-jadwal']);
         
         Permission::create(['name'=>'acc-mahasiswa']);
         Permission::create(['name'=>'manage-mahasiswa']);
@@ -33,6 +33,7 @@ class RolePermissionSeeder extends Seeder
 
         Permission::create(['name'=>'kelola-ukt']);
         Permission::create(['name'=>'kelola-nilai']);
+        Permission::create(['name'=>'informasi-ukt']);
 
         Role::create(['name'=>'superadmin']);
         Role::create(['name'=>'mahasiswa']);
@@ -52,6 +53,8 @@ class RolePermissionSeeder extends Seeder
         $roleSuperadmin->givePermissionTo('tambah-dosen');
         $roleSuperadmin->givePermissionTo('edit-dosen');
         $roleSuperadmin->givePermissionTo('hapus-dosen');
+        $roleSuperadmin->givePermissionTo('kelola-nilai');
+        $roleSuperadmin->givePermissionTo('informasi-ukt');
 
         $roleDosenwali = Role::findByName('dosenwali');
         $roleDosenwali->givePermissionTo('lihat-mahasiswa');
@@ -61,6 +64,7 @@ class RolePermissionSeeder extends Seeder
         $roleDosenwali->givePermissionTo('manage-mahasiswa');
         $roleDosenwali->givePermissionTo('acc-mahasiswa');
         $roleDosenwali->givePermissionTo('kelola-nilai');
+        $roleDosenwali->givePermissionTo('informasi-ukt');
 
         $roleKaprodi = Role::findByName('kaprodi');
         $roleKaprodi->givePermissionTo('lihat-mahasiswa');
@@ -71,10 +75,19 @@ class RolePermissionSeeder extends Seeder
         $roleKajur = Role::findByName('kajur');
         $roleKajur->givePermissionTo('lihat-mahasiswa');
         $roleKajur->givePermissionTo('manage-mahasiswa');
+        $roleKajur->givePermissionTo('kelola-nilai');
+        $roleKajur->givePermissionTo('informasi-ukt');
+        $roleKajur->givePermissionTo('manage-dosen');
+        $roleKajur->givePermissionTo('tambah-mahasiswa');
+        $roleKajur->givePermissionTo('edit-mahasiswa');
+        $roleKajur->givePermissionTo('hapus-mahasiswa');
+        $roleKajur->givePermissionTo('tambah-dosen');
+        $roleKajur->givePermissionTo('edit-dosen');
+        $roleKajur->givePermissionTo('hapus-dosen');
 
         $roleMahasiswa = Role::findByName('mahasiswa');
         $roleMahasiswa->givePermissionTo('tambah-jadwal');
-        $roleMahasiswa->givePermissionTo('buat-jadwal');
+        $roleMahasiswa->givePermissionTo('bikin-jadwal');
         
         $roleMahasiswa = Role::findByName('keuangan');
         $roleMahasiswa->givePermissionTo('kelola-ukt');

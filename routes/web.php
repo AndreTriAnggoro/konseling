@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa')->middleware('permission:lihat-mahasiswa');
+    // Route::get('mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa')->middleware('permission:lihat-mahasiswa');
     Route::get('dosen', [DosenController::class, 'index'])->name('dosen')->middleware('permission:manage-dosen');
     Route::get('mahasiswa/create', [MahasiswaController::class, 'create'])->name('mahasiswa.create')->middleware('permission:tambah-mahasiswa');
     Route::get('dosen/create', [DosenController::class, 'create'])->name('dosen.create')->middleware('permission:tambah-dosen');
@@ -48,6 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('mahasiswa/{id}', [MahasiswaController::class, 'update'])->name('mahasiswa.update')->middleware('permission:edit-mahasiswa');
     Route::put('dosen/{id}', [DosenController::class, 'update'])->name('dosen.update')->middleware('permission:edit-dosen');
     Route::delete('mahasiswa/{id}', [MahasiswaController::class, 'destroy'])->name('mahasiswa.destroy')->middleware('permission:hapus-mahasiswa');
+    Route::get('mahasiswa/{id}', [MahasiswaController::class, 'restore'])->name('mahasiswa.restore');
     Route::delete('dosen/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
     Route::get('/get-kelas', [MahasiswaController::class, 'getKelas'])->name('get-kelas');
     Route::get('/notifikasi-dosenwali', [JadwalController::class, 'notifdosen'])->name('notif.dosen');
@@ -92,7 +93,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/coming-soon', [DosenController::class, 'comingSoon'])->name('coming-soon');
     Route::post('/upload-image', [ChatController::class, 'uploadImage'])->name('upload.image');
-    
+
     Route::get('/nilai-mahasiswa', [MahasiswaController::class, 'nilai'])->name('nilai.mahasiswa')->middleware('permission:kelola-nilai');
 
     Route::get('/mahasiswa/upload', [MahasiswaController::class, 'showUploadForm'])->name('mahasiswa.upload.form');
@@ -100,7 +101,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/admin/dashboard', [MahasiswaController::class, 'showUnverifiedPayments'])->name('admin.dashboard');
     Route::get('/admin/verifikasi/{id_pembayaran}', [MahasiswaController::class, 'verifikasi'])->name('admin.verifikasi');
-    Route::get('/mahasiswa/ukt', [MahasiswaController::class, 'mahasiswaUkt'])->name('mahasiswa.ukt');
+    
+    
+    Route::get('/ukt/mahasiswa', [MahasiswaController::class, 'mahasiswaUkt'])->name('ukt.mahasiswa');
+
+    Route::get('/ukt/belum/bayar', [MahasiswaController::class, 'uktbelumbayar'])->name('ukt.belum.bayar');
+    Route::get('/ukt/diproses', [MahasiswaController::class, 'uktdiproses'])->name('ukt.diproses');
+    Route::get('/ukt/lunas', [MahasiswaController::class, 'uktlunas'])->name('ukt.lunas');
+
+    Route::get('/mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa');
+    Route::get('/mahasiswa/inactive', [MahasiswaController::class, 'inactive'])->name('mahasiswa.inactive');
+    Route::get('/tes', [MahasiswaController::class, 'tes'])->name('tes');
 });
 
 

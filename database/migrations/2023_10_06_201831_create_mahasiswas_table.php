@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('no_hp');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_programstudi')->references('id_programstudi')->on('programstudi');
         });
