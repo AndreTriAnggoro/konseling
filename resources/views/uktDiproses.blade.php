@@ -25,9 +25,9 @@
                         Lihat Bukti
                     </a></td>
                 <td>
-                    <a href="{{ route('admin.verifikasi', $pembayaran->id_pembayaran) }}">Setujui</a>
+                    <a href="{{ route('admin.lunas', $pembayaran->id_pembayaran) }}">Setujui</a>
                     |
-                    <a href="{{ route('admin.verifikasi', ['id_pembayaran' => $pembayaran->id_pembayaran, 'status_pembayaran' => 'Belum Bayar']) }}">Tolak</a>
+                    <a href="{{ route('admin.tidakLunas', $pembayaran->id_pembayaran) }}">Tolak</a>
                 </td>
             </tr>
 

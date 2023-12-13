@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DosenController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ImportController;
+use App\Models\Mahasiswa;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,24 +38,26 @@ Route::middleware('auth')->group(function () {
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Route::get('mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa')->middleware('permission:lihat-mahasiswa');
     Route::get('dosen', [DosenController::class, 'index'])->name('dosen')->middleware('permission:manage-dosen');
     Route::get('mahasiswa/create', [MahasiswaController::class, 'create'])->name('mahasiswa.create')->middleware('permission:tambah-mahasiswa');
     Route::get('dosen/create', [DosenController::class, 'create'])->name('dosen.create')->middleware('permission:tambah-dosen');
     Route::post('mahasiswa/store', [MahasiswaController::class, 'store'])->name('mahasiswa.store')->middleware('permission:tambah-mahasiswa');
     Route::post('dosen/store', [DosenController::class, 'store'])->name('dosen.store')->middleware('permission:tambah-dosen');
-    Route::get('mahasiswa/{id}/edit', [MahasiswaController::class, 'edit'])->name('mahasiswa.edit')->middleware('permission:edit-mahasiswa');
+    Route::get('mahasiswa/{nim}/edit', [MahasiswaController::class, 'edit'])->name('mahasiswa.edit')->middleware('permission:edit-mahasiswa');
     Route::get('dosen/{id}/edit', [DosenController::class, 'edit'])->name('dosen.edit');
     Route::put('mahasiswa/{id}', [MahasiswaController::class, 'update'])->name('mahasiswa.update')->middleware('permission:edit-mahasiswa');
     Route::put('dosen/{id}', [DosenController::class, 'update'])->name('dosen.update')->middleware('permission:edit-dosen');
     Route::delete('mahasiswa/{id}', [MahasiswaController::class, 'destroy'])->name('mahasiswa.destroy')->middleware('permission:hapus-mahasiswa');
     Route::get('mahasiswa/{id}', [MahasiswaController::class, 'restore'])->name('mahasiswa.restore');
+    Route::get('dosen/{id}', [DosenController::class, 'restore'])->name('dosen.restore');
     Route::delete('dosen/{id}', [DosenController::class, 'destroy'])->name('dosen.destroy');
     Route::get('/get-kelas', [MahasiswaController::class, 'getKelas'])->name('get-kelas');
     Route::get('/notifikasi-dosenwali', [JadwalController::class, 'notifdosen'])->name('notif.dosen');
     // Route::get('/buat-jadwal-konseling', [MahasiswaController::class, 'buatjadwal'])->name('buat.jadwal');
 
     Route::get('/dashboard', [JadwalController::class, 'tampilkanDashboard'])->name('dashboard');
+
+    Route::get('mahasiswa/search', [MahasiswaController::class, 'search'])->name('mahasiswa.search');
 
     Route::get('/buat-jadwal-konseling', [JadwalController::class, 'index'])->name('buat.jadwal');
     Route::get('/jadwal-konseling-dosen', [JadwalController::class, 'jadwaldosen'])->name('jadwal.dosen');
@@ -96,12 +99,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/nilai-mahasiswa', [MahasiswaController::class, 'nilai'])->name('nilai.mahasiswa')->middleware('permission:kelola-nilai');
 
-    Route::get('/mahasiswa/upload', [MahasiswaController::class, 'showUploadForm'])->name('mahasiswa.upload.form');
+    Route::get('/mahasiswa/upload/bukti/ukt', [MahasiswaController::class, 'uploadBukti'])->name('mahasiswa.upload.bukti.ukt');
+
     Route::post('/mahasiswa/upload', [MahasiswaController::class, 'upload'])->name('mahasiswa.upload');
 
     Route::get('/admin/dashboard', [MahasiswaController::class, 'showUnverifiedPayments'])->name('admin.dashboard');
-    Route::get('/admin/verifikasi/{id_pembayaran}', [MahasiswaController::class, 'verifikasi'])->name('admin.verifikasi');
-    
+    Route::get('/admin/lunas/{id_pembayaran}', [MahasiswaController::class, 'Lunas'])->name('admin.lunas');
+    Route::get('/admin/tidakLunas/{id_pembayaran}', [MahasiswaController::class, 'tidakLunas'])->name('admin.tidakLunas');
     
     Route::get('/ukt/mahasiswa', [MahasiswaController::class, 'mahasiswaUkt'])->name('ukt.mahasiswa');
 
@@ -111,7 +115,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa');
     Route::get('/mahasiswa/inactive', [MahasiswaController::class, 'inactive'])->name('mahasiswa.inactive');
-    Route::get('/tes', [MahasiswaController::class, 'tes'])->name('tes');
+    Route::get('/dosen/inactive', [DosenController::class, 'inactive'])->name('dosen.inactive');
+
+    Route::patch('/update-status-pembayaran/{id}', [MahasiswaController::class, 'updateStatusPembayaran'])->name('update_status_pembayaran');
 });
 
 

@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('nilai', function (Blueprint $table) {
-            $table->integer('nim')->primary(); // Kolom foreign key
-            $table->integer('semester1');
-            $table->integer('semester2');
-            $table->integer('semester3');
-            $table->integer('semester4');
-            $table->integer('semester5');
-            $table->integer('semester6');
-            $table->integer('semester7');
-            $table->integer('semester8');
-            $table->integer('ipk');
+            $table->integer('nim')->primary();
+            $table->float('semester1');
+            $table->float('semester2');
+            $table->float('semester3');
+            $table->float('semester4');
+            $table->float('semester5');
+            $table->float('semester6');
+            $table->float('semester7');
+            $table->float('semester8');
+            $table->float('ipk');
             $table->timestamps();
         });
     }

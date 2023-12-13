@@ -2,11 +2,11 @@
 @section('content')
 
 <div class="content">
-    <h2 class="mt-3 mb-4">Daftar Mahasiswa Sudah Tidak Aktif</h2>
-    <a href="{{ route('mahasiswa') }}" class="btn btn-primary mb-5" id="buttonMahasiswa">Mahasiswa Aktif</a>
+    <h2 class="mt-3 mb-4">Daftar Dosenwali Sudah Tidak Aktif</h2>
+    <a href="{{ route('dosen') }}" class="btn btn-primary mb-5" id="buttonDosen">Dosen Aktif</a>
 
     <div class="form-outline mb-4" data-mdb-input-init>
-        <input type="search" style=" background-color: #f2f2f2;" class="form-control" id="datatable-search-input" placeholder="Search Mahasiswa ...">
+        <input type="search" style=" background-color: #f2f2f2;" class="form-control" id="datatable-search-input" placeholder="Search Dosen ...">
     </div>
     <div id="datatable">
     </div>
@@ -17,34 +17,32 @@
     </div>
     @endif
 
-    <table class="table" id="mahasiswaTidakAktifTable">
+    <table class="table" id="dosenTidakAktifTable">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">nim</th>
-                <th scope="col">nama</th>
+                <th scope="col">nip_dosenwali</th>
                 <th scope="col">programstudi</th>
-                <th scope="col">jenis kelamin</th>
-                <th scope="col">alamat</th>
+                <th scope="col">nama</th>
                 <th scope="col">email</th>
                 <th scope="col">no hp</th>
+                <th scope="col">alamat</th>
                 @if (auth()->user()->can('edit-mahasiswa') || auth()->user()->can('hapus-mahasiswa'))
                 <th scope="col">Aksi</th>
                 @endif
             </tr>
         </thead>
-        <tbody>
-            @foreach ($mahasiswaInactive as $item)
+        <tbody>  
+            @foreach ($dosenwaliInactive as $item)
             <tr @if ($item->trashed()) @endif>
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $item->nim }}</td>
-                <td>{{ $item->nama }}</td>
+                <td>{{ $item->nip_dosenwali }}</td>
                 <td>{{ $item->programstudi ? $item->programstudi->nama_prodi : 'Tidak ada prodi' }}</td>
-                <td>{{ $item->jenis_kelamin }}</td>
-                <td>{{ $item->alamat }}</td>
+                <td>{{ $item->nama }}</td>
                 <td>{{ $item->email }}</td>
                 <td>{{ $item->no_hp }}</td>
-                @if (auth()->user()->can('edit-mahasiswa') || auth()->user()->can('hapus-mahasiswa'))
+                <td>{{ $item->alamat }}</td>
+                @if (auth()->user()->can('hapus-mahasiswa'))
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="aksiDropdown" style="max-width: 4rem; max-height: 25px;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -53,7 +51,7 @@
                         </button>
 
                         <div class="dropdown-menu" aria-labelledby="aksiDropdown">
-                            <a href="{{ route('mahasiswa.restore', $item->nim) }}" class="dropdown-item">Aktifkan</a>
+                            <a href="{{ route('dosen.restore', $item->nip_dosenwali) }}" class="dropdown-item">Aktifkan</a>
                         </div>
                     </div>
                 </td>

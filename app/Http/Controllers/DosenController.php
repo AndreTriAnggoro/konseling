@@ -15,7 +15,7 @@ class DosenController extends Controller
 {
     public function index()
     {
-        $dosen = DosenWali::with('programstudi')->get();
+        $dosen = DosenWali::with('programstudi')->paginate(5);
         return view('dosen', compact('dosen'));
     }
 
@@ -129,18 +129,62 @@ class DosenController extends Controller
 
     public function destroy($nip_dosenwali)
     {
-        // Cari mahasiswa berdasarkan ID
-        $dosen = DosenWali::find($nip_dosenwali);
 
-        // Hapus mahasiswa jika ditemukan
+
+        $dosen = DosenWali::with('user')->find($nip_dosenwali);
+
+        // Hapus mahasiswa dan pengguna jika ditemukan
         if ($dosen) {
+            // Hapus pengguna terkait
+            if ($dosen->user) {
+                User::where('username', $dosen->user->username)->delete();
+            }
+
+            // Hapus mahasiswa
             $dosen->delete();
+
             // Redirect ke halaman daftar mahasiswa atau halaman lain yang sesuai
             return redirect()->route('dosen');
         } else {
             // Tampilkan pesan error jika mahasiswa tidak ditemukan
             abort(404, 'Dosen not found.');
         }
+    }
+
+    public function restore($nip_dosenwali)
+    {
+        DosenWali::withTrashed()->where('nip_dosenwali', $nip_dosenwali)->restore();
+
+        // Dapatkan data mahasiswa yang sudah di-restore
+        $dosenwaliRestored = DosenWali::find($nip_dosenwali);
+
+        // Jika mahasiswa ditemukan, lakukan proses pengembalian data user
+        if ($dosenwaliRestored) {
+            // Dapatkan atau buat user baru berdasarkan username (nim)
+            $user = User::firstOrNew(['username' => $dosenwaliRestored->nip_dosenwali]);
+
+            // Isi kolom name dengan data nama dari tabel mahasiswa
+            $user->name = $dosenwaliRestored->nama;
+
+            // Isi kolom password dengan password default (Anda bisa menggunakan Hash::make('12345678') jika menggunakan Laravel Hashing)
+            $user->password = bcrypt('12345678');
+            // Tambahkan proses pengembalian data user sesuai kebutuhan
+            // ...
+
+            // Simpan perubahan pada data user
+            $user->save();
+            $user->assignRole('dosenwali');
+        }
+
+        // Redirect kembali ke halaman mahasiswa tidak aktif
+        $dosenwaliInactive = DosenWali::onlyTrashed()->with('programstudi')->get();
+        return view('dosen_tidak_aktif', compact('dosenwaliInactive'));
+    }
+
+    public function inactive()
+    {
+        $dosenwaliInactive = DosenWali::onlyTrashed()->with('programstudi')->get();
+        return view('dosen_tidak_aktif', compact('dosenwaliInactive'));
     }
 
     public function store(Request $request)

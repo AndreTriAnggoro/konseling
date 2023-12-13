@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_pembayaran');
             $table->integer('nim'); // Kolom foreign key
             $table->integer('jumlah_pembayaran')->default(0);
-            $table->enum('status_pembayaran', ['Belum Bayar', 'Dalam Proses', 'Lunas'])->default('Belum Bayar');
+            $table->enum('status_pembayaran', ['Belum Bayar', 'Dalam Proses', 'Lunas', 'Gagal Bayar', 'KIP'])->default('Belum Bayar');
             $table->date('tanggal_pembayaran')->nullable()->default(null);
             $table->string('bukti_pembayaran')->default('');
             $table->timestamps();

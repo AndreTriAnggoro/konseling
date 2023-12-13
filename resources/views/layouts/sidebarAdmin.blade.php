@@ -81,7 +81,7 @@
 
           @role('mahasiswa')
           <li>
-            <a href="{{ route('mahasiswa.upload.form') }}">
+            <a href="{{ route('mahasiswa.upload.bukti.ukt') }}">
               <span class="link-title">Pembayaran UKT</span>
               <i class="mdi mdi-gauge link-icon"></i>
             </a>

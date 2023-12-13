@@ -10,6 +10,7 @@ use App\Models\Programstudi;
 use Illuminate\Http\Request;
 use App\Models\Jadwal;
 use App\Models\Nilai;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,15 +19,26 @@ class MahasiswaController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    public function updateStatusPembayaran($id)
+    {
+        $pembayaran = Pembayaran::find($id);
+
+        if ($pembayaran) {
+            $pembayaran->update(['status_pembayaran' => request('status_pembayaran')]);
+            // Tambahkan logika lain yang diperlukan
+        }
+
+        return back();
+    }
+
+
     public function uktlunas()
     {
         $pembayaranLunas = Pembayaran::where('status_pembayaran', 'Lunas')->get();
         return view('uktLunas', compact('pembayaranLunas'));
     }
-    public function tes()
-    {
-        return view('app/tes');
-    }
+
     public function uktdiproses()
     {
         $pembayaranDiproses = Pembayaran::where('status_pembayaran', 'Dalam Proses')->get();
@@ -37,10 +49,15 @@ class MahasiswaController extends Controller
         $pembayaranBelumDiverifikasi = Pembayaran::where('status_pembayaran', 'Belum Bayar')->get();
         return view('uktBelumVerif', compact('pembayaranBelumDiverifikasi'));
     }
-    public function index()
+    public function index(Request $request)
     {
-        $mahasiswa = Mahasiswa::with('programstudi')->paginate(15);
+        $mahasiswa = Mahasiswa::with('programstudi')->paginate(20);
         return view('mahasiswa', compact('mahasiswa'));
+    }
+
+    public function uploadBukti()
+    {
+        return view('upload');
     }
 
     public function inactive()
@@ -49,10 +66,18 @@ class MahasiswaController extends Controller
         return view('mahasiswa_tidak_aktif', compact('mahasiswaInactive'));
     }
 
-    public function verifikasi($id_pembayaran)
+    public function Lunas($id_pembayaran)
     {
         $notifikasi = Pembayaran::findOrFail($id_pembayaran);
         $notifikasi->status_pembayaran = 'Lunas';
+        $notifikasi->save();
+
+        return redirect()->back();
+    }
+    public function tidakLunas($id_pembayaran)
+    {
+        $notifikasi = Pembayaran::findOrFail($id_pembayaran);
+        $notifikasi->status_pembayaran = 'Gagal Bayar';
         $notifikasi->save();
 
         return redirect()->back();
@@ -127,6 +152,10 @@ class MahasiswaController extends Controller
     public function nilai()
     {
         $nilai = Nilai::paginate(15);
+        foreach ($nilai as $item) {
+            $mahasiswa = Mahasiswa::where('nim', $item->nim)->first();
+            $item->nama = $mahasiswa ? $mahasiswa->nama : 'Sudah Tidak Aktif';
+        }
         return view('nilai_mahasiswa', compact('nilai'));
     }
 
@@ -142,7 +171,7 @@ class MahasiswaController extends Controller
             'id_programstudi' => 'required',
             'alamat' => 'required',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'email' => 'required|email',
+            'email' => 'required', // Perubahan di sini
             'no_hp' => 'required',
         ]);
 
@@ -156,6 +185,7 @@ class MahasiswaController extends Controller
         $mahasiswa->jenis_kelamin = $request->input('jenis_kelamin');
         $mahasiswa->email = $request->input('email');
         $mahasiswa->no_hp = $request->input('no_hp');
+
         // Simpan data ke database
         $mahasiswa->save();
 
@@ -172,7 +202,6 @@ class MahasiswaController extends Controller
         $pembayaran->save();
 
         // event(new CreateMahasiswaUser($mahasiswa));
-
         return redirect()->route('mahasiswa')->with('success', 'Data mahasiswa berhasil disimpan.');
     }
 
@@ -198,13 +227,13 @@ class MahasiswaController extends Controller
     public function update(Request $request, $nim)
     {
         $request->validate([
-            'nim' => 'required|string|max:255',
+            'nim' => 'required|integer',
             'nama' => 'required|string|max:255',
             'id_programstudi' => 'required',
             'alamat' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:Laki-laki,Perempuan', // Menggunakan validasi 'in' untuk memastikan nilai jenis kelamin adalah 'L' atau 'P'
-            'email' => 'required|email|max:255',
-            'no_hp' => 'required|string|max:15',
+            'email' => 'required|email',
+            'no_hp' => 'required|integer',
         ]);
 
         $mahasiswa = Mahasiswa::findOrFail($nim);
@@ -224,7 +253,7 @@ class MahasiswaController extends Controller
         $user->save();
 
         // Kembali ke halaman "mahasiswa.blade.php" dengan data mahasiswa yang telah diperbarui
-        $mahasiswa = Mahasiswa::all();
+        $mahasiswa = Mahasiswa::with('programstudi')->paginate(15);
 
         return view('mahasiswa', compact('mahasiswa'));
     }
@@ -312,7 +341,7 @@ class MahasiswaController extends Controller
                 ->orWhere('tanggal_pembayaran', 'LIKE', $searchTerm);
         }
 
-        $pembayaranUktMahasiswa = $query->get();
+        $pembayaranUktMahasiswa = $query->paginate(5);
 
         return view('mahasiswa_ukt', compact('pembayaranUktMahasiswa'));
     }
@@ -321,7 +350,7 @@ class MahasiswaController extends Controller
     {
         // Validasi file dan data lainnya
         $request->validate([
-            'file' => 'required|mimes:pdf,jpg,png|max:2048',
+            'file' => 'required|mimes:jpg,png|max:2048',
             'jumlah_pembayaran' => 'required|numeric',
             'tanggal_pembayaran' => 'required|date',
             // Tambahkan validasi lain sesuai kebutuhan Anda
@@ -344,7 +373,7 @@ class MahasiswaController extends Controller
             'bukti_pembayaran' => $fileNama,
         ]);
 
-        return redirect()->route('mahasiswa.upload.form')->with('success', 'Bukti pembayaran berhasil diunggah.');
+        return redirect()->route('mahasiswa.upload.bukti.ukt')->with('success', 'Bukti pembayaran berhasil diunggah.');
     }
 
     public function accNotifikasi($id_jadwal)

@@ -1,75 +1,130 @@
+<style>
+    .container {
+        max-width: 600px;
+        /* Sesuaikan lebar container sesuai kebutuhan */
+        margin: 0 auto;
+    }
+
+    .content {
+        /* background-color: #fff; */
+        /* Warna latar belakang */
+        padding: 20px;
+        border-radius: 8px;
+        /* Sudut elemen yang membulat */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        /* Efek bayangan */
+    }
+
+    h1 {
+        font-size: 28px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    p {
+        color: #666;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+</style>
 @extends('layouts.master')
 @section('content')
 
 <div class="content">
+    <h1 class="mb-2 mt-3">Ubah Data Dosen</h1>
+    <p class="mb-4 ml-1" style="color: #666;">Lengkapi formulir di bawah ini untuk mengubah data dosen ke dalam sistem. Pastikan untuk memeriksa kembali setiap data yang diubah sebelum menyimpan.</p>
     <div class="card card-info card-outline">
         <div class="card-body">
-            <h1>Edit Dosenwali</h1>
 
-            <form action="{{ route('dosen.update', $dosen->nip_dosenwali) }}" method="POST">
+            <form action="{{ route('dosen.update', $dosen->nip_dosenwali) }}" method="POST" class="row g-3 needs-validation" novalidate>
                 @csrf
                 @method('PUT') <!-- Method PUT digunakan untuk mengupdate data -->
 
-                <div class="form-group">
+                <div class="form-group col-md-6">
                     <label for="nip_dosenwali">NIP:</label>
                     <input type="text" name="nip_dosenwali" id="nip_dosenwali" class="form-control" value="{{ $dosen->nip_dosenwali }}" required>
-                    @if ($errors->has('nip_dosenwali'))
-                        <div class="alert alert-danger">{{ $errors->first('nip_dosenwali') }}</div>
-                    @endif
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group col-md-6">
                     <label for="nama">Nama:</label>
                     <input type="text" name="nama" id="nama" class="form-control" value="{{ $dosen->nama }}" required>
-                    @if ($errors->has('nama'))
-                        <div class="alert alert-danger">{{ $errors->first('nama') }}</div>
-                    @endif
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group col-md-6">
                     <label for="id_programstudi">Program Studi:</label>
                     <select name="id_programstudi" id="id_programstudi" class="form-control" required>
                         <option value="">Pilih Program Studi</option>
                         @foreach ($programstudi as $ps)
-                            <option value="{{ $ps->id_programstudi }}" {{ $dosen->id_programstudi == $ps->id_programstudi ? 'selected' : '' }}>
-                                {{ $ps->nama_prodi }}
-                            </option>
+                        <option value="{{ $ps->id_programstudi }}" {{ $dosen->id_programstudi == $ps->id_programstudi ? 'selected' : '' }}>
+                            {{ $ps->nama_prodi }}
+                        </option>
                         @endforeach
                     </select>
-                    @if ($errors->has('id_programstudi'))
-                        <div class="alert alert-danger">{{ $errors->first('id_programstudi') }}</div>
-                    @endif
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group col-md-6">
                     <label for="alamat">Alamat:</label>
                     <textarea name="alamat" id="alamat" class="form-control" required>{{ $dosen->alamat }}</textarea>
-                    @if ($errors->has('alamat'))
-                        <div class="alert alert-danger">{{ $errors->first('alamat') }}</div>
-                    @endif
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group col-md-6">
                     <label for="email">Email:</label>
                     <input type="email" name="email" id="email" class="form-control" value="{{ $dosen->email }}" required>
-                    @if ($errors->has('email'))
-                        <div class="alert alert-danger">{{ $errors->first('email') }}</div>
-                    @endif
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group col-md-6">
                     <label for="no_hp">No. HP:</label>
                     <input type="text" name="no_hp" id="no_hp" class="form-control" value="{{ $dosen->no_hp }}" required>
-                    @if ($errors->has('no_hp'))
-                        <div class="alert alert-danger">{{ $errors->first('no_hp') }}</div>
-                    @endif
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
                 </div>
 
-
-                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                <div class="form-group col-md-12 mt-4">
+                    <button type="submit" class="btn btn-primary mx-auto d-block">Simpan Perubahan</button>
+                </div>
             </form>
         </div>
     </div>
 </div>
 
 @endsection
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        (function() {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms)
+                .forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    });
+</script>

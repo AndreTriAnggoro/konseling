@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('no_hp');
             $table->string('alamat', 100);
             $table->timestamps();
+            $table->softDeletes();
 
             // Menambahkan foreign key ke tabel programstudi
             $table->foreign('id_programstudi')->references('id_programstudi')->on('programstudi');
